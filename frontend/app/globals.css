@@ -1,35 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --background: #04121f;
-  --foreground: #eaf6ff;
+  --background: #0f0c1b;
+  --foreground: #e2dfed;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-eb-garamond);
 }
 
 body {
-  background: var(--background);
+  background: radial-gradient(circle at center, #1b1836 0%, #08060f 100%);
   color: var(--foreground);
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
-@keyframes wave-drift {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-.wave-track {
-  animation: wave-drift 18s linear infinite;
-  width: 200%;
-}
-
-.wave-track.wave-slow {
-  animation-duration: 28s;
-  animation-direction: reverse;
+body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 30px 30px;
+  z-index: 0;
 }
 
 @keyframes float-y {
@@ -42,7 +40,6 @@ body {
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
