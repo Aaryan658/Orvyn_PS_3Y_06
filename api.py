@@ -1,4 +1,9 @@
-"""FastAPI wrapper around model.joblib, for the Next.js frontend to call."""
+"""FastAPI wrapper around the trained models, for the Next.js frontend to call.
+
+Loads model_core.joblib (fallback HistGB model + WQI regressor -- pure sklearn, always
+loadable) unconditionally, then tries model_tabpfn.joblib and falls back to the HistGB model
+if TabPFN's weights/package aren't available in this environment (e.g. Render free tier).
+"""
 import io
 
 import joblib
@@ -11,11 +16,19 @@ from risk import risk_band
 from who_ranges import who_flags
 from wqi import compute_wqi, wqi_category
 
-bundle = joblib.load("model.joblib")
-model, threshold, columns, feature_importance, wqi_model, metrics = (
-    bundle["model"], bundle["threshold"], bundle["columns"],
-    bundle["feature_importance"], bundle["wqi_model"], bundle["metrics"],
+core = joblib.load("model_core.joblib")
+columns, feature_importance, wqi_model, metrics = (
+    core["columns"], core["feature_importance"], core["wqi_model"], core["metrics"],
 )
+
+try:
+    tabpfn_bundle = joblib.load("model_tabpfn.joblib")
+    model, threshold, active_model = tabpfn_bundle["model"], tabpfn_bundle["threshold"], "TabPFN"
+except Exception as e:
+    model, threshold, active_model = core["fallback_model"], core["fallback_threshold"], "HistGradientBoosting (fallback)"
+    print(f"TabPFN unavailable ({e}); serving predictions with the fallback model instead.")
+
+print(f"Serving predictions with: {active_model}")
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -35,7 +48,7 @@ class Sample(BaseModel):
 
 @app.get("/metrics")
 def get_metrics():
-    return {**metrics, "feature_importance": feature_importance}
+    return {**metrics, "feature_importance": feature_importance, "active_model": active_model}
 
 
 @app.post("/predict")
@@ -55,6 +68,7 @@ def predict(sample: Sample):
         "wqi_computed_category": wqi_category(true_wqi),
         "wqi_predicted": ml_wqi,
         "wqi_predicted_category": wqi_category(ml_wqi),
+        "active_model": active_model,
     }
 
 

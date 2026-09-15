@@ -1,4 +1,7 @@
 pandas
 scikit-learn
-streamlit
 tabpfn
+fastapi
+uvicorn[standard]
+python-multipart
+streamlit
