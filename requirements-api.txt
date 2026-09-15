@@ -1,8 +1,6 @@
 pandas==2.3.3
 scikit-learn==1.8.0
 joblib==1.5.3
-tabpfn
 fastapi
 uvicorn[standard]
 python-multipart
-streamlit
