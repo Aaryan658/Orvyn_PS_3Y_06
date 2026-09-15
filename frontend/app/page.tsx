@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-const API = "http://localhost:8000";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const FIELDS: { name: string; label: string; unit: string; default: number }[] = [
   { name: "ph", label: "pH", unit: "", default: 7.0 },

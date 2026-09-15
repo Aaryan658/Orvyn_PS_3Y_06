@@ -1,4 +1,3 @@
-model_core.joblib
 model_tabpfn.joblib
 __pycache__/
 *.pyc
